@@ -55,11 +55,6 @@ Route::middleware(['auth', 'verified', 'role:rt,rw,kades,operator,admin'])->grou
         ->middleware(['auth', 'verified'])
         ->name('applications.reject');
 
-    /*
-    |--------------------------------------------------------------------------
-    | User Management (Opsional)
-    |--------------------------------------------------------------------------
-    */
     Route::resource('users', UserController::class);
 
     /*

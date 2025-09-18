@@ -102,6 +102,15 @@
                             <span class="font-semibold">Data Warga</span>
                         </a>
                     </li>
+                    @if (Auth::user()->role === 'admin')
+                    <li>
+                        <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('users.index') ? 'bg-green-800' : 'text-gray-200 hover:bg-green-800 hover:text-white' }} rounded-lg transition-colors duration-200">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span class="font-semibold">Manajemen User</span>
+                        </a>
+                    @endif
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

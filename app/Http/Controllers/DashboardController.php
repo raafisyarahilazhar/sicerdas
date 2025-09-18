@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Application;
 use App\Models\Resident;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
@@ -77,8 +78,9 @@ class DashboardController extends Controller
                 $applications = Application::all();
                 $residents = Resident::all();
                 $history = Application::latest()->take(10)->get();
+                $users = User::latest()->take(10)->get();
 
-                return view('dashboard.index', compact('applications', 'residents', 'history'));
+                return view('dashboard.index', compact('applications', 'residents', 'history', 'users'));
 
             default:
                 return view('dashboard.default');

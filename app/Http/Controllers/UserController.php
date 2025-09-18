@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with(['rt', 'rw'])->latest()->paginate(10);
-        return view('users.index', compact('users'));
+        return view('user.index', compact('users'));
     }
 
     // Form tambah user
@@ -22,7 +22,7 @@ class UserController extends Controller
     {
         $rts = Rt::all();
         $rws = Rw::all();
-        return view('users.create', compact('rts', 'rws'));
+        return view('user.create', compact('rts', 'rws'));
     }
 
     // Simpan user baru
@@ -69,7 +69,7 @@ class UserController extends Controller
     // Detail user
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        return view('user.show', compact('user'));
     }
 
     // Form edit user
@@ -77,7 +77,7 @@ class UserController extends Controller
     {
         $rts = Rt::all();
         $rws = Rw::all();
-        return view('users.edit', compact('user', 'rts', 'rws'));
+        return view('user.edit', compact('user', 'rts', 'rws'));
     }
 
     // Update user
