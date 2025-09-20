@@ -52,24 +52,29 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center space-x-4">
                                         @if ($application->status == 'approved')
-                                            <a href="{{ route('applications.generatePdf', $application) }}" 
-                                            target="_blank" 
-                                            class="text-gray-600 hover:text-green-700">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                            </a>
-                                        @elseif ($application->pdf_path)
-                                            <a href="{{ Storage::url($application->pdf_path) }}" 
-                                            target="_blank" 
-                                            class="text-gray-600 hover:text-green-700">
-                                            Lihat PDF yang Sudah Dibuat
-                                            </a>
+                                            @if ($application->pdf_path)
+                                                {{-- Jika file sudah ada, tampilkan tombol Unduh --}}
+                                                <a href="{{ route('applications.downloadPdf', $application) }}" title="Unduh Surat" class="action-btn bg-blue-500 hover:bg-blue-600">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                </a>
+                                            @else
+                                                {{-- Jika file belum dibuat, tampilkan tombol Buat --}}
+                                                <a href="{{ route('applications.generatePdf', $application) }}" title="Buat File Surat" class="action-btn bg-green-500 hover:bg-green-600">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                </a>
+                                            @endif
                                         @endif
+
                                         {{-- <a href="#" title="Unduh" class="text-gray-600 hover:text-green-700">
                                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                         </a> --}}
-                                        <button title="Hapus" class="text-gray-600 hover:text-red-700">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
+                                        <form action="{{ route('applications.destroy', $application->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus permohonan ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" title="Hapus" class="action-btn bg-red-500 hover:bg-red-600">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -87,4 +92,6 @@
             <a href="#" class="font-semibold text-green-700 hover:underline">Kembali</a>
         </div>
     </main>
+
+    
 @endsection

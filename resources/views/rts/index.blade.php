@@ -3,7 +3,7 @@
 @section('content')
 <div class="bg-white p-6 rounded shadow">
     <h1 class="text-xl font-bold mb-4">Daftar User</h1>
-    <a href="{{ route('users.create') }}" class="bg-green-600 text-white px-4 py-2 rounded">Tambah User</a>
+    <a href="{{ route('rts.create') }}" class="bg-green-600 text-white px-4 py-2 rounded">Tambah User</a>
     <table class="w-full mt-4 border">
         <tr class="bg-gray-100">
             <th class="p-2 border">Nama RT</th>

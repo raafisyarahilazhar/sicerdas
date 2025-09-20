@@ -9,7 +9,7 @@ class ApplicationType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'requirements', 'deskripsi', 'file_template'];
+    protected $fillable = ['name', 'requirements', 'deskripsi', 'template_file'];
 
     protected $casts = [
         'requirements' => 'array',

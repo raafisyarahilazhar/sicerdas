@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\ApplicationType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ApplicationTypeController extends Controller
 {
     public function index()
     {
-        $applicationTypes = ApplicationType::all();
+        $applicationTypes = ApplicationType::latest()->get();
         return view('application_types.index', compact('applicationTypes'));
     }
 
@@ -20,42 +22,71 @@ class ApplicationTypeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_surat' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:application_types,name',
+            'template_file' => 'required|file|mimes:docx',
+            'requirements' => 'nullable|array',
+            'requirements.*.label' => 'required_with:requirements.*.name|string|max:255',
+            'requirements.*.name' => 'required_with:requirements.*.label|string|max:255|regex:/^[a-z_]+$/',
+            'requirements.*.type' => 'required_with:requirements.*.name|in:text,date,file,textarea',
         ]);
 
-        ApplicationType::create($request->all());
-        return redirect()->route('application_types.index')->with('success', 'Template surat berhasil ditambahkan.');
+        $data = [
+            'name' => $validated['name'],
+            'requirements' => array_values(array_filter($request->input('requirements', []))),
+        ];
+
+        if ($request->hasFile('template_file')) {
+            $path = $request->file('template_file')->store('letter_templates', 'public');
+            $data['template_file'] = $path;
+        }
+
+        ApplicationType::create($data);
+
+        return redirect()->route('application-types.index')->with('success', 'Jenis surat berhasil dibuat.');
     }
 
-    public function edit(ApplicationType $ApplicationType)
+    public function edit(ApplicationType $applicationType)
     {
-        return view('application_types.edit', compact('ApplicationType'));
+        return view('application_types.edit', compact('applicationType'));
     }
 
-    public function update(Request $request, ApplicationType $ApplicationType)
+    public function update(Request $request, ApplicationType $applicationType)
     {
-        $request->validate([
-            'nama_surat' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255', Rule::unique('application_types')->ignore($applicationType->id)],
+            'template_file' => 'nullable|file|mimes:docx',
+            'requirements' => 'nullable|array',
+            'requirements.*.label' => 'required_with:requirements.*.name|string|max:255',
+            'requirements.*.name' => 'required_with:requirements.*.label|string|max:255|regex:/^[a-z_]+$/',
+            'requirements.*.type' => 'required_with:requirements.*.name|in:text,date,file,textarea',
         ]);
 
-        $ApplicationType->update($request->all());
-        return redirect()->route('application_types.index')->with('success', 'Template surat berhasil diperbarui.');
+        $data = [
+            'name' => $validated['name'],
+            'requirements' => array_values(array_filter($request->input('requirements', []))),
+        ];
+
+        if ($request->hasFile('template_file')) {
+            // Hapus file lama jika ada file baru yang diupload
+            if ($applicationType->template_file) {
+                Storage::disk('public')->delete($applicationType->template_file);
+            }
+            $path = $request->file('template_file')->store('letter_templates', 'public');
+            $data['template_file'] = $path;
+        }
+
+        $applicationType->update($data);
+
+        return redirect()->route('application-types.index')->with('success', 'Jenis surat berhasil diperbarui.');
     }
 
-    public function requirements($applicationTypeId)
+    public function destroy(ApplicationType $applicationType)
     {
-        $applicationType = ApplicationType::with('requirements')->findOrFail($applicationTypeId);
-
-        return response()->json($applicationType->requirements);
-    }
-
-
-    public function destroy(ApplicationType $ApplicationType)
-    {
-        $ApplicationType->delete();
-        return redirect()->route('application_types.index')->with('success', 'Template surat berhasil dihapus.');
+        if ($applicationType->template_file) {
+            Storage::disk('public')->delete($applicationType->template_file);
+        }
+        $applicationType->delete();
+        return redirect()->route('application-types.index')->with('success', 'Jenis surat berhasil dihapus.');
     }
 }

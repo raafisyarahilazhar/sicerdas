@@ -80,11 +80,23 @@
                     <li>
                         <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-200 hover:bg-green-800 hover:text-white rounded-lg transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                               <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                             </svg>
                             <span class="font-semibold">Manajemen Konten & Pengguna</span>
                         </a>
                     </li>
+                    @endif
+                    @if (auth::User()->role === 'admin')
+                        <li>
+                        <a href="{{ route('application-types.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('application-types.index') ? 'bg-green-800' : 'text-gray-200 hover:bg-green-800 hover:text-white' }} rounded-lg transition-colors duration-200">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 12l4.179 2.25m0 0l5.571 3 5.571-3m0 0l4.179-2.25L12 9.75l-5.571 2.25z" />
+                            </svg>
+                            <span class="font-semibold">Manajemen Surat</span>
+                        </a>
+                    </li>
+                    @endif
+                    @if (Auth::user()->role === 'admin' || Auth::user()->role === 'operator')
                     <li>
                         <a href="{{ route('dashboard-surat') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('dashboard-surat') ? 'bg-green-800' : 'text-gray-200 hover:bg-green-800 hover:text-white' }} rounded-lg transition-colors duration-200">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

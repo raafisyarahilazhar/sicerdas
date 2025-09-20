@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('application_types', function (Blueprint $table) {
-            $table->text('requirements')->nullable()->after('name'); // json or text
+        Schema::create('beritas', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('application_types', function (Blueprint $table) {
-            $table->dropColumn('requirements');
-        });
+        Schema::dropIfExists('beritas');
     }
 };

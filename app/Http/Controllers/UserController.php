@@ -14,7 +14,9 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with(['rt', 'rw'])->latest()->paginate(10);
-        return view('user.index', compact('users'));
+        $rts = Rt::all();
+        $rws = Rw::all();
+        return view('user.index', compact('users', 'rts', 'rws'));
     }
 
     // Form tambah user

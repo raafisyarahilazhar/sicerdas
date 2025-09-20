@@ -14,39 +14,49 @@
             <table class="w-full text-sm text-left text-green-600">
                 <thead class="text-xs text-gray-700 uppercase bg-green-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3">No Ref</th>
-                        <th scope="col" class="px-6 py-3">Jenis Surat</th>
-                        <th scope="col" class="px-6 py-3">Pemohon</th>
-                        <th scope="col" class="px-6 py-3 text-center">Aksi</th>
+                        <th scope="col" class="px-6 py-3 w-1/5">No Ref</th>
+                        <th scope="col" class="px-6 py-3 w-2/5">Jenis Surat</th>
+                        <th scope="col" class="px-6 py-3 w-1/5">Pemohon</th>
+                        <th scope="col" class="px-6 py-3 w-1/5 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($applications as $application)
-                        <tr class="bg-white border-b hover:bg-gray-50">
-                            <td class="px-6 py-4 font-medium text-green-900">{{ $application->ref_number }}</td>
-                            <td class="px-6 py-4">{{ $application->applicationType->name }}</td>
-                            <td class="px-6 py-4">{{ $application->resident->name ?? '-' }}</td>
-                            @if (Auth::user()->role === 'admin' || Auth::user()->role === 'rt' || Auth::user()->role === 'rw' || Auth::user()->role === 'kades')
-                                <td class="px-6 py-4 text-center space-x-2">
-                                    <form action="{{ route('applications.approve', $application) }}" method="POST" class="inline">
+                        <tr class="bg-white border-b hover:bg-gray-50 align-middle">
+                            <td class="px-6 py-4 font-semibold text-gray-900 whitespace-nowrap">
+                                {{ $application->ref_number }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $application->applicationType->name }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ $application->resident->name ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{-- Gunakan flexbox untuk menata tombol dengan rapi --}}
+                                <div class="flex flex-col sm:flex-row items-center justify-center gap-2">
+                                    <a href="{{ route('applications.show', $application) }}" class="btn-sm bg-blue-600 hover:bg-blue-700">Detail</a>
+                                    
+                                    <form action="{{ route('applications.approve', $application) }}" method="POST">
                                         @csrf
-                                        <button class="font-medium text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md transition-colors">Approve</button>
+                                        <button type="submit" class="btn-sm bg-green-600 hover:bg-green-700">Approve</button>
                                     </form>
-                                    <form action="{{ route('applications.reject', $application) }}" method="POST" class="inline">
+                                    
+                                    <form action="{{ route('applications.reject', $application) }}" method="POST">
                                         @csrf
-                                        <button class="font-medium text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md transition-colors">Reject</button>
+                                        <button type="submit" class="btn-sm bg-red-600 hover:bg-red-700">Reject</button>
                                     </form>
-                                </td>
-                            @endif
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center px-6 py-4 text-green-500">Tidak ada pengajuan yang menunggu persetujuan.</td>
+                            <td colspan="4" class="text-center px-6 py-4 text-gray-500">Tidak ada pengajuan yang menunggu persetujuan.</td>
                         </tr>
                     @endforelse
                     @if (Auth::user()->role === 'admin' || Auth::user()->role === 'operator')
                         <tr>
-                            <td>
+                            <td colspan="4" class="px-6 py-4">
                                 <p class="text-sm text-gray-500 italic mt-4">
                                     * Hanya RT, RW, Dan Kepala Desa yang boleh menyetujui permohonan.
                                 </p>
@@ -100,4 +110,25 @@
         </div>
     </div>
 </main>
+
+<style>
+    .btn-sm {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        padding: 0.375rem 0.75rem;
+        font-weight: 500;
+        color: white;
+        border-radius: 0.375rem;
+        transition-property: background-color;
+        transition-duration: 200ms;
+        white-space: nowrap;
+    }
+    @media (min-width: 640px) {
+        .btn-sm {
+            width: auto;
+        }
+    }
+</style>
+
 @endsection

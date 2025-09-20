@@ -4,24 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\ApplicationType;
-use App\Models\Resident;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
+use PhpOffice\PhpWord\TemplateProcessor; // <-- PENTING: Gunakan library PHPWord
 
 class ApplicationController extends Controller
 {
     public function index()
     {
-        $applications  = Application::with('ApplicationType', 'resident')->get();
+        // Ambil data aplikasi sesuai peran pengguna
+        $user = Auth::user();
+        if ($user->role === 'warga') {
+            $applications = Application::where('resident_id', $user->resident->id)
+                ->with('applicationType', 'resident')
+                ->latest()
+                ->get();
+        } else {
+            // Untuk peran lain (admin, dll.), tampilkan semua
+            $applications = Application::with('applicationType', 'resident')
+                ->latest()
+                ->get();
+        }
         return view('applications.index', compact('applications'));
     }
 
     public function create()
     {
-        $applicationTypes = ApplicationType::all();
-        // dd($applicationTypes->toArray()); 
+        $applicationTypes = ApplicationType::orderBy('name')->get();
         return view('applications.create', compact('applicationTypes'));
     }
 
@@ -30,38 +40,33 @@ class ApplicationController extends Controller
         $type = ApplicationType::findOrFail($request->application_type_id);
 
         $rules = [];
-        // Ambil semua data dari array 'fields' yang dikirim dari form
         $fieldData = $request->input('fields', []);
 
-        // Generate rules validasi dinamis dari requirements
-        foreach ($type->requirements as $field) {
-            $fieldName = $field['name'];
-            $rule = $field['required'] ? 'required' : 'nullable';
-
-            if ($field['type'] === 'file') {
-                $rule .= '|file|mimes:jpg,jpeg,png,pdf|max:2048';
-            } else {
-                $rule .= '|string';
+        if ($type->requirements) {
+            foreach ($type->requirements as $field) {
+                $fieldName = $field['name'];
+                $rule = $field['required'] ? 'required' : 'nullable';
+                if ($field['type'] === 'file') {
+                    $rule .= '|file|mimes:jpg,jpeg,png,pdf|max:2048';
+                } else {
+                    $rule .= '|string';
+                }
+                $rules['fields.' . $fieldName] = $rule;
             }
-            
-            // Targetkan validasi ke dalam array 'fields' (contoh: 'fields.nama_pemohon')
-            $rules['fields.' . $fieldName] = $rule;
         }
 
         $request->validate($rules);
 
         $dataToStore = [];
-        // Proses dan simpan file upload jika ada
-        foreach ($type->requirements as $field) {
-            $fieldName = $field['name'];
-
-            if ($field['type'] === 'file' && $request->hasFile('fields.' . $fieldName)) {
-                // Simpan file ke storage/app/public/application_documents
-                $path = $request->file('fields.' . $fieldName)->store('application_documents', 'public');
-                $dataToStore[$fieldName] = $path;
-            } else {
-                // Ambil data dari input teks, tanggal, dll.
-                $dataToStore[$fieldName] = $fieldData[$fieldName] ?? null;
+        if ($type->requirements) {
+            foreach ($type->requirements as $field) {
+                $fieldName = $field['name'];
+                if ($field['type'] === 'file' && $request->hasFile('fields.' . $fieldName)) {
+                    $path = $request->file('fields.' . $fieldName)->store('application_documents', 'public');
+                    $dataToStore[$fieldName] = $path;
+                } else {
+                    $dataToStore[$fieldName] = $fieldData[$fieldName] ?? null;
+                }
             }
         }
 
@@ -80,46 +85,79 @@ class ApplicationController extends Controller
         return view('applications.show', compact('application'));
     }
 
-    // app/Http/Controllers/ApplicationController.php
-
+    /**
+     * Generate surat dari template Word (.docx).
+     */
     public function generatePdf(Application $application)
     {
-        // 1. Pastikan hanya surat yang sudah disetujui yang bisa diproses
         if ($application->status !== 'approved') {
             return back()->with('error', 'Surat belum disetujui atau ditolak.');
         }
 
-        // Jika PDF sudah pernah dibuat, langsung saja unduh
-        if ($application->pdf_path && Storage::disk('public')->exists($application->pdf_path)) {
-            return Storage::disk('public')->download($application->pdf_path);
+        try {
+            // 1. Ambil path template .docx dari database
+            $templatePath = $application->applicationType->template_file;
+
+            if (!$templatePath || !Storage::disk('public')->exists($templatePath)) {
+                return back()->with('error', 'Template Word (.docx) untuk jenis surat ini tidak ditemukan.');
+            }
+
+            // 2. Buat instance TemplateProcessor dari PHPWord
+            $templateProcessor = new TemplateProcessor(Storage::disk('public')->path($templatePath));
+
+            // 3. Ambil data yang dibutuhkan
+            $resident = $application->resident;
+            $formData = $application->form_data;
+
+            // 4. Ganti placeholder dari data pemohon (resident)
+            $templateProcessor->setValue('resident_name', $resident->name ?? '');
+            $templateProcessor->setValue('resident_nik', $resident->nik ?? '');
+            $templateProcessor->setValue('resident_address', $resident->address ?? '');
+            $templateProcessor->setValue('resident_phone', $resident->phone ?? '');
+            $templateProcessor->setValue('resident_gender', $resident->gender ?? '');
+            // Tambahkan data resident lain yang Anda butuhkan (contoh: 'resident_job', dll.)
+
+            // 5. Ganti placeholder dari data isian form
+            if (is_array($formData)) {
+                foreach ($formData as $key => $value) {
+                    $templateProcessor->setValue($key, $value ?? '');
+                }
+            }
+            
+            // 6. Ganti placeholder sistem
+            $templateProcessor->setValue('tanggal_surat', now()->isoFormat('D MMMM YYYY'));
+            $templateProcessor->setValue('nomor_surat', $application->ref_number);
+
+            // 7. Simpan hasilnya sebagai file .docx baru
+            $filename = 'surat-' . $application->ref_number . '.docx'; // Ekstensi .docx
+            $outputPath = 'surat_jadi/' . $filename;
+            
+            $templateProcessor->saveAs(storage_path('app/public/' . $outputPath));
+
+            // 8. Update path di database
+            $application->update(['pdf_path' => $outputPath]);
+
+            return back()->with('success', 'File surat (.docx) berhasil dibuat dan disimpan!');
+
+        } catch (\Exception $e) {
+            // Tangkap error jika terjadi masalah saat memproses template
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download file surat yang sudah dibuat (bisa .docx atau .pdf).
+     */
+    public function downloadPdf(Application $application)
+    {
+        if (auth()->user()->role === 'warga' && auth()->id() !== $application->resident->user_id) {
+             abort(403, 'Anda tidak memiliki akses ke dokumen ini.');
         }
 
-        // 2. Ambil data yang dibutuhkan
-        $resident = $application->resident;
-        $data = $application->form_data;
-        
-        // 3. Tentukan template Blade yang akan digunakan
-        $templateName = '';
-        switch ($application->applicationType->name) {
-            case 'Surat Keterangan Domisili':
-                $templateName = 'surat_templates.domisili';
-                break;
-            // Tambahkan case lain untuk jenis surat lainnya
-            default:
-                return back()->with('error', 'Template surat tidak ditemukan.');
+        if (!$application->pdf_path || !Storage::disk('public')->exists($application->pdf_path)) {
+            return back()->with('error', 'File surat tidak ditemukan. Silakan buat ulang file.');
         }
-        
-        // 4. Load view dan data, lalu ubah menjadi PDF
-        $pdf = Pdf::loadView($templateName, compact('data', 'resident'));
-        
-        // 5. Simpan PDF ke server dan update path di database
-        $filename = 'surat-' . $application->ref_number . '.pdf';
-        // Simpan di dalam folder storage/app/public/surat_jadi
-        Storage::disk('public')->put('surat_jadi/' . $filename, $pdf->output());
 
-        $application->update(['pdf_path' => 'surat_jadi/' . $filename]);
-
-        // 6. Kembalikan pengguna ke halaman sebelumnya dengan pesan sukses
-        return back()->with('success', 'PDF berhasil dibuat dan disimpan!');
+        return Storage::disk('public')->download($application->pdf_path);
     }
 }

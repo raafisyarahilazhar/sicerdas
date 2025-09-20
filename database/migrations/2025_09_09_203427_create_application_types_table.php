@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('code')->nullable(); // e.g. SKD (Surat Keterangan Domisili)
             $table->string('name');
+            $table->text('requirements')->nullable();
+            $table->string('template_file')->nullable()
+                  ->comment('Path ke file template Word (.docx)');
             $table->timestamps();
         });
     }
