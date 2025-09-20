@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
             RwSeeder::class,
             RtSeeder::class,
             UserSeeder::class,
-            ApplicationTypeSeeder::class,
+            // ApplicationTypeSeeder::class,
         ]);
     }
 }

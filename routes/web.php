@@ -10,7 +10,10 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ApplicationTypeController;
 use App\Http\Controllers\ApplicationApprovalController;
 use App\Http\Controllers\AntreanController;
+use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\ManajemenKontenController;
+use App\Http\Controllers\MainController;
 use App\Http\Controllers\NotificationController;
 
 /*
@@ -18,14 +21,19 @@ use App\Http\Controllers\NotificationController;
 | Rute Publik (Bisa diakses siapa saja)
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+
+Route::get('/', [MainController::class, 'index'])->name('welcome');
+Route::get('/news', [MainController::class, 'berita'])->name('news');
+// Route::get('/', function () {
+//     return view('welcome');
+// })->name('welcome');
 
 Route::get('/antrean', [AntreanController::class, 'index'])->name('antrean.index');
 Route::post('/antrean/ambil', [AntreanController::class, 'ambil'])->name('antrean.ambil');
 
-
+// --- Rute Berita Publik ---
+// Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
+Route::get('/berita/{berita}', [BeritaController::class, 'show'])->name('berita.show');
 /*
 |--------------------------------------------------------------------------
 | Rute Terotentikasi (Hanya untuk user yang sudah login)
@@ -44,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/applications/{application}/download-pdf', [ApplicationController::class, 'downloadPdf'])->name('applications.downloadPdf');
     
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+
 
     
     // --- Grup Rute Khusus untuk Peran Aparat Desa (RT, RW, Kades, Operator, Admin) ---
@@ -68,6 +77,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('rts', RtController::class);
         Route::resource('rws', RwController::class);
         Route::resource('application-types', ApplicationTypeController::class);
+
+        // --- Rute Manajemen Berita ---
+        Route::get('konten', [ManajemenKontenController::class, 'index'])->name('dashboard.manajemen-konten');
+        Route::get('berita', [BeritaController::class, 'create'])->name('berita.create');
+        Route::post('berita', [BeritaController::class, 'store'])->name('berita.store');
+        Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
     });
 });
 

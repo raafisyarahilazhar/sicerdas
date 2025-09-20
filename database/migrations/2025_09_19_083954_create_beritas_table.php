@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('beritas', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->text('content');
+            $table->string('author')->nullable();
+            $table->date('published_at')->nullable();
+            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }

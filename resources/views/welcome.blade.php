@@ -44,12 +44,17 @@
 
                 <section>
                     <h3 class="text-xl text-green-700 font-bold border-l-4 border-green-700 pl-4 mb-5">BERITA</h3>
-                     <div class="p-6 rounded-lg shadow-sm space-y-4 text-green-700 text-justify border">
-                        <p>Adobe XD, or Experience Design, is built for today's UX/UI designers, with intuitive tools that eliminate speed bumps and make everyday tasks effortless. Get started with free UI kits, icon sets, and everything you need to create unique user experiences.</p>
-                        <hr>
-                        <p>Adobe XD, or Experience Design, is built for today's UX/UI designers, with intuitive tools that eliminate speed bumps and make everyday tasks effortless. Get started with free UI kits, icon sets, and everything you need to create unique user experiences.</p>
-                        <div class="text-right border-t pt-2">
-                            <a href="#" class="inline-block bg-green-700 text-white px-5 py-2 rounded-md hover:bg-green-800 transition-all duration-300 transform hover:scale-105">Selengkapnya ></a>
+                    <div class="p-6 rounded-lg shadow-sm space-y-4 text-green-700 text-justify border">
+                        @forelse ($berita as $item)
+                            <a href="berita/{{ $item->id }}" class="block hover:bg-green-50 rounded-lg transition-colors">
+                                <p>{!! Str::limit($item->content, 60) !!}</p>
+                                <hr class="my-5">
+                            </a>
+                        @empty
+                            <p>Belum ada berita terpublikasi</p>
+                        @endforelse
+                        <div class="text-right">
+                            <a href="/news" class="inline-block bg-green-700 text-white px-5 py-2 rounded-md hover:bg-green-800 transition-all duration-300 transform hover:scale-105">Selengkapnya ></a>
                         </div>
                     </div>
                 </section>
