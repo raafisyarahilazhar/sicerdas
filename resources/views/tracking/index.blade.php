@@ -11,6 +11,13 @@
 
         <h2 class="text-4xl font-bold text-center text-green-700 mb-10">Status Permohonan</h2>
 
+        @if(session('success'))
+            <div class="alert success-alert">
+                <span class="close-btn">&times;</span>
+                <strong>Sukses!</strong> {{ session('success') }}
+            </div>
+        @endif
+
         <div class="border border-green-200 rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">

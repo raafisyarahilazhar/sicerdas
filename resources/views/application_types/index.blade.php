@@ -2,6 +2,12 @@
 
 @section('content')
 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 lg:p-10">
+    @if(session('success'))
+        <div class="alert success-alert">
+            <span class="close-btn">&times;</span>
+            <strong>Sukses!</strong> {{ session('success') }}
+        </div>
+    @endif
     <div class="bg-white p-6 rounded-2xl shadow-lg">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-green-800">Manajemen Jenis Surat</h1>

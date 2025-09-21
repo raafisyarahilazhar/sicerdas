@@ -45,7 +45,8 @@ class ApplicationController extends Controller
         if ($type->requirements) {
             foreach ($type->requirements as $field) {
                 $fieldName = $field['name'];
-                $rule = $field['required'] ? 'required' : 'nullable';
+                $isRequired = $field['required'] ?? false;
+                $rule = $isRequired ? 'required' : 'nullable';
                 if ($field['type'] === 'file') {
                     $rule .= '|file|mimes:jpg,jpeg,png,pdf|max:2048';
                 } else {

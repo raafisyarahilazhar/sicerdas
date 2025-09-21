@@ -1,35 +1,3 @@
-{{-- <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Sistem Layanan Desa</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen">
-    <nav class="bg-green-700 text-white p-4 flex justify-between">
-        <h1 class="font-bold">Sistem Layanan Desa</h1>
-        <div>
-            <a href="{{ route('dashboard') }}" class="px-2">Dashboard</a>
-            <a href="{{ route('users.index') }}" class="px-2">Users</a>
-            <a href="{{ route('rts.index') }}" class="px-2">RT</a>
-            <a href="{{ route('rws.index') }}" class="px-2">RW</a>
-            <a href="{{ route('applications.index') }}" class="px-2">Surat</a>
-            <a href="{{ route('application-types.index') }}" class="px-2">Jenis Surat</a>
-            <a href="{{ route('antrean.index') }}" class="px-2">Antrean</a>
-            <a href="{{ route('tracking.index') }}" class="px-2">Tracking</a>
-            <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <button class="px-2">Logout</button>
-            </form>
-        </div>
-    </nav>
-    <div class="p-6">
-        @yield('content')
-    </div>
-</body>
-</html>
-     --}}
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -50,6 +18,41 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+
+        .alert {
+            padding: 20px;
+            background-color: #4CAF50; /* Green */
+            color: white;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            position: relative;
+            opacity: 1;
+            transition: opacity 0.6s;
+        }
+
+        .alert.hide {
+            opacity: 0;
+        }
+
+        .alert.hide .close-btn {
+            display: none;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-btn:hover {
+            color: black;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -174,6 +177,21 @@
             </footer>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var closeButton = document.querySelector('.close-btn');
+
+            if (closeButton) {
+                closeButton.onclick = function() {
+                    var alertDiv = this.parentElement;
+                    alertDiv.style.opacity = '0';
+                    setTimeout(function() {
+                        alertDiv.style.display = 'none';
+                    }, 600); // Harus sama dengan nilai transisi di CSS
+                }
+            }
+        });
+    </script>
     @stack('addon-script')
 </body>
 </html>

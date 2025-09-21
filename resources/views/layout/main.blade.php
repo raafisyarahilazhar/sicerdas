@@ -5,8 +5,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SICERDAS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .alert {
+            padding: 20px;
+            background-color: #4CAF50; /* Green */
+            color: white;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            position: relative;
+            opacity: 1;
+            transition: opacity 0.6s;
+        }
+
+        .alert.hide {
+            opacity: 0;
+        }
+
+        .alert.hide .close-btn {
+            display: none;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-btn:hover {
+            color: black;
+        }
+    </style>
+   
 </head>
 
 <body class="bg-white">
@@ -173,6 +208,24 @@
             </div>
         </div>
     </footer>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var closeButton = document.querySelector('.close-btn');
+
+            if (closeButton) {
+                closeButton.onclick = function() {
+                    var alertDiv = this.parentElement;
+                    alertDiv.style.opacity = '0';
+                    setTimeout(function() {
+                        alertDiv.style.display = 'none';
+                    }, 600); // Harus sama dengan nilai transisi di CSS
+                }
+            }
+        });
+    </script>
 
     <script>
         // JavaScript for mobile menu toggle

@@ -28,7 +28,6 @@ class BeritaController extends Controller
      */
     public function show(Berita $berita)
     {
-        // Pastikan warga hanya bisa melihat berita yang sudah publish
         if (!$berita->published_at) {
             abort(404);
         }
