@@ -58,7 +58,9 @@
 
     <main class="flex flex-col md:flex-row min-h-screen">
         
-        <div class="w-full md:w-2/5 bg-green-600 text-white p-12 flex flex-col justify-center items-center text-center space-y-6">
+       <div class="w-full md:w-2/5 text-white p-12 flex flex-col justify-center items-center text-center space-y-6 bg-cover bg-center" style="background-image: url('/images/bg-head.jpg');"
+
+
             <h2 class="text-4xl font-bold">Hello, Friend!</h2>
             <p class="px-4">
                 Lorem Ipsum is simply dummy text of the printing and typesetting industry.
