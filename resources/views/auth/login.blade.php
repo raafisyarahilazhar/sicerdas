@@ -54,21 +54,11 @@
     <title>Login - SICERDAS</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-white">
+<body class="bg-white h-screen overflow-hidden">
 
     <main class="flex flex-col md:flex-row min-h-screen">
         
-       <div class="w-full md:w-2/5 text-white p-12 flex flex-col justify-center items-center text-center space-y-6 bg-cover bg-center" style="background-image: url('/images/bg-head.jpg');"
-
-
-            <h2 class="text-4xl font-bold">Hello, Friend!</h2>
-            <p class="px-4">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-            </p>
-            <a href="/register" class="inline-block border-2 border-white rounded-full px-12 py-3 font-semibold uppercase hover:bg-white hover:text-green-600 transition-colors duration-300">
-                Sign Up
-            </a>
-        </div>
+   
 
         <div class="w-full md:w-3/5 bg-white p-12 flex flex-col justify-center items-center">
             <div class="w-full max-w-md">
@@ -116,6 +106,22 @@
                 </form>
             </div>
         </div>
+
+<div class="hidden md:flex w-full md:w-2/5 text-white p-12 flex-col justify-center items-center text-center space-y-6 bg-cover bg-center"
+     style="background-image: url('/images/bg-login-register.jpg');">
+
+    <h2 class="text-4xl font-bold">Hello, Friend!</h2>
+
+    <p class="px-4">
+        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+    </p>
+
+    <a href="/register"
+       class="inline-block border-2 border-white rounded-full px-12 py-3 font-semibold uppercase hover:bg-white hover:text-green-600 transition-colors duration-300">
+        Sign Up
+    </a>
+</div>
+
 
     </main>
 
