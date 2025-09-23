@@ -8,9 +8,16 @@
         <h2 class="text-2xl font-bold text-green-800 mb-4">Daftar User</h2>
     </div>
 
+    @if(session('success'))
+        <div class="alert success-alert">
+            <span class="close-btn">&times;</span>
+            <strong>{{ session('success') }}</strong> 
+        </div>
+    @endif
+
     {{-- 3. Riwayat Permohonan Terbaru --}}
     <div class="bg-white p-6 rounded-2xl shadow-lg">
-        <a href="{{ route('users.create') }}" class="font-medium text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md transition-colors">Tambah User</a>
+        <a href="{{ route('users.create') }}" class="font-medium text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md transition-colors">+ Tambah User</a>
         <div class="overflow-x-auto mt-4">
             <table class="w-full text-sm text-left text-green-600">
                 <thead class="text-xs text-gray-700 uppercase bg-green-50">

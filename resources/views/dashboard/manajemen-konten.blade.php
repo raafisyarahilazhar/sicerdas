@@ -8,6 +8,13 @@
         <h2 class="text-2xl font-bold text-green-800 mb-4">Manajemen Konten</h2>
     </div>
 
+    @if(session('success'))
+        <div class="alert success-alert">
+            <span class="close-btn">&times;</span>
+            <strong>{{ session('success') }}</strong> 
+        </div>
+    @endif
+
     {{-- Tabel Daftar Berita --}}
     <div class="bg-white p-6 rounded-2xl shadow-lg">
         <div class="flex justify-between items-center mb-4">

@@ -7,7 +7,7 @@
                 Adobe XD, or Experience Design, is built for today's UX/UI designers, with intuitive tools that eliminate speed bumps and make everyday tasks effortless. Get started with free UI kits, icon sets, and everything you need to create unique user experiences.
             </p>
             <div>
-                <img src="https://placehold.co/1200x400/ccc/333?text=Banner+Image" alt="Team discussing work" class="w-full h-auto object-cover rounded-xl shadow-md">
+                <img src="{{ asset('images/header.jpg') }}" alt="Team discussing work" class="w-full h-auto object-cover rounded-xl shadow-md">
             </div>
         </div>
 

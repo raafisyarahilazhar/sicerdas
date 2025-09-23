@@ -8,6 +8,13 @@
         <h2 class="text-2xl font-bold text-green-800 mb-4">Data Surat</h2>
     </div>
 
+    @if(session('success'))
+        <div class="alert success-alert">
+            <span class="close-btn">&times;</span>
+            <strong>{{ session('success') }}</strong> 
+        </div>
+    @endif
+
     {{-- 3. Riwayat Permohonan Terbaru --}}
     <div class="bg-white p-6 rounded-2xl shadow-lg">
         <h2 class="text-xl font-bold text-green-800 mb-4">Surat Yang Sudah Disetujui</h2>

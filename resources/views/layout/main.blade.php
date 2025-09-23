@@ -221,7 +221,7 @@
                     alertDiv.style.opacity = '0';
                     setTimeout(function() {
                         alertDiv.style.display = 'none';
-                    }, 600); // Harus sama dengan nilai transisi di CSS
+                    }, 600);
                 }
             }
         });

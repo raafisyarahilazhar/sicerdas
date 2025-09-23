@@ -14,7 +14,7 @@
         @if(session('success'))
             <div class="alert success-alert">
                 <span class="close-btn">&times;</span>
-                <strong>Sukses!</strong> {{ session('success') }}
+                <strong>{{ session('success') }}</strong> 
             </div>
         @endif
 
