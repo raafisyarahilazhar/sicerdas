@@ -86,10 +86,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+Route::get('/verify/{token}', [VerificationController::class, 'verify'])->name('document.verify');
 
-/*
-|--------------------------------------------------------------------------
-| Rute Otentikasi Bawaan
-|--------------------------------------------------------------------------
-*/
 require __DIR__.'/auth.php';

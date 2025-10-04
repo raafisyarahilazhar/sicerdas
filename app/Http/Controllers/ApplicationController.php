@@ -7,24 +7,21 @@ use App\Models\ApplicationType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpWord\TemplateProcessor; // <-- PENTING: Gunakan library PHPWord
+use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\Settings;
 
 class ApplicationController extends Controller
 {
     public function index()
     {
-        // Ambil data aplikasi sesuai peran pengguna
         $user = Auth::user();
         if ($user->role === 'warga') {
             $applications = Application::where('resident_id', $user->resident->id)
-                ->with('applicationType', 'resident')
-                ->latest()
-                ->get();
+                ->with('applicationType', 'resident')->latest()->get();
         } else {
-            // Untuk peran lain (admin, dll.), tampilkan semua
-            $applications = Application::with('applicationType', 'resident')
-                ->latest()
-                ->get();
+            $applications = Application::with('applicationType', 'resident')->latest()->get();
         }
         return view('applications.index', compact('applications'));
     }
@@ -38,7 +35,6 @@ class ApplicationController extends Controller
     public function store(Request $request)
     {
         $type = ApplicationType::findOrFail($request->application_type_id);
-
         $rules = [];
         $fieldData = $request->input('fields', []);
 
@@ -57,7 +53,6 @@ class ApplicationController extends Controller
         }
 
         $request->validate($rules);
-
         $dataToStore = [];
         if ($type->requirements) {
             foreach ($type->requirements as $field) {
@@ -87,7 +82,8 @@ class ApplicationController extends Controller
     }
 
     /**
-     * Generate surat dari template Word (.docx).
+     * Generate surat dari template Word (.docx) dan konversi ke PDF.
+     * Versi ini TIDAK menggunakan QR Code atau TTE.
      */
     public function generatePdf(Application $application)
     {
@@ -95,59 +91,73 @@ class ApplicationController extends Controller
             return back()->with('error', 'Surat belum disetujui atau ditolak.');
         }
 
+        $tempDocxPath = null; // Inisialisasi untuk pembersihan jika error
+
         try {
-            // 1. Ambil path template .docx dari database
+            // 1. Konfigurasi PDF Renderer
+            Settings::setPdfRendererName(Settings::PDF_RENDERER_DOMPDF);
+            Settings::setPdfRendererPath(base_path('vendor/dompdf/dompdf'));
+
             $templatePath = $application->applicationType->template_file;
-
             if (!$templatePath || !Storage::disk('public')->exists($templatePath)) {
-                return back()->with('error', 'Template Word (.docx) untuk jenis surat ini tidak ditemukan.');
+                return back()->with('error', 'Template Word (.docx) untuk surat ini tidak ditemukan.');
             }
-
-            // 2. Buat instance TemplateProcessor dari PHPWord
+            
+            // 2. Proses Template Word
             $templateProcessor = new TemplateProcessor(Storage::disk('public')->path($templatePath));
-
-            // 3. Ambil data yang dibutuhkan
+            
             $resident = $application->resident;
             $formData = $application->form_data;
-
-            // 4. Ganti placeholder dari data pemohon (resident)
-            $templateProcessor->setValue('resident_name', $resident->name ?? '');
-            $templateProcessor->setValue('resident_nik', $resident->nik ?? '');
-            $templateProcessor->setValue('resident_address', $resident->address ?? '');
-            $templateProcessor->setValue('resident_phone', $resident->phone ?? '');
-            $templateProcessor->setValue('resident_gender', $resident->gender ?? '');
-            // Tambahkan data resident lain yang Anda butuhkan (contoh: 'resident_job', dll.)
-
-            // 5. Ganti placeholder dari data isian form
+            
+            // Mengisi placeholder data pemohon dan isian form
+            $templateProcessor->setValue('resident_name', $resident->name ?? '-');
+            $templateProcessor->setValue('resident_nik', $resident->nik ?? '-');
+            $templateProcessor->setValue('resident_address', $resident->address ?? '-');
+            $templateProcessor->setValue('resident_phone', $resident->phone ?? '-');
+            $templateProcessor->setValue('resident_place_of_birth', $resident->place_of_birth ?? '-');
+            $templateProcessor->setValue('resident_date_of_birth', $resident->birth_date ? $resident->birth_date->isoFormat('D MMMM YYYY') : '-');
+            $templateProcessor->setValue('resident_gender', $resident->gender == 'L' ? 'Laki-laki' : 'Perempuan');
+            
             if (is_array($formData)) {
                 foreach ($formData as $key => $value) {
-                    $templateProcessor->setValue($key, $value ?? '');
+                    $templateProcessor->setValue($key, strip_tags($value ?? '-'));
                 }
             }
             
-            // 6. Ganti placeholder sistem
-            $templateProcessor->setValue('tanggal_surat', now()->isoFormat('D MMMM YYYY'));
             $templateProcessor->setValue('nomor_surat', $application->ref_number);
-
-            // 7. Simpan hasilnya sebagai file .docx baru
-            $filename = 'surat-' . $application->ref_number . '.docx'; // Ekstensi .docx
-            $outputPath = 'surat_jadi/' . $filename;
+            $templateProcessor->setValue('tanggal_surat', now()->isoFormat('D MMMM YYYY'));
             
-            $templateProcessor->saveAs(storage_path('app/public/' . $outputPath));
+            // 3. Proses Konversi ke PDF
+            $tempDocxDir = storage_path('app/public/temp_docs');
+            if (!file_exists($tempDocxDir)) mkdir($tempDocxDir, 0755, true);
+            $tempDocxPath = $tempDocxDir . '/temp-' . $application->ref_number . '.docx';
+            $templateProcessor->saveAs($tempDocxPath);
+            
+            $phpWord = IOFactory::load($tempDocxPath);
+            
+            $pdfFilename = 'surat-' . $application->ref_number . '.pdf';
+            $pdfOutputPath = 'surat_jadi/' . $pdfFilename;
+            
+            $pdfWriter = IOFactory::createWriter($phpWord, 'PDF');
+            $pdfWriter->save(Storage::disk('public')->path($pdfOutputPath));
 
-            // 8. Update path di database
-            $application->update(['pdf_path' => $outputPath]);
-
-            return back()->with('success', 'File surat (.docx) berhasil dibuat dan disimpan!');
+            // 4. Pembersihan & Penyimpanan
+            unlink($tempDocxPath); // Hapus file .docx sementara
+            
+            $application->update(['pdf_path' => $pdfOutputPath]);
+            
+            return Storage::disk('public')->download($pdfOutputPath);
 
         } catch (\Exception $e) {
-            // Tangkap error jika terjadi masalah saat memproses template
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            if($tempDocxPath && file_exists($tempDocxPath)) unlink($tempDocxPath);
+            
+            Log::error('PDF Generation Failed: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return back()->with('error', 'Gagal membuat file PDF: ' . $e->getMessage());
         }
     }
 
     /**
-     * Download file surat yang sudah dibuat (bisa .docx atau .pdf).
+     * Download file surat yang sudah dibuat.
      */
     public function downloadPdf(Application $application)
     {

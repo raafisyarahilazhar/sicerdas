@@ -33,9 +33,11 @@
                 <section>
                     <h3 class="text-xl text-green-700 font-bold border-l-4 border-green-700 pl-4 mb-5">PENGUMUMAN</h3>
                     <div class="p-6 rounded-lg shadow-sm space-y-4 text-green-700 text-justify border">
-                        <p>Adobe XD, or Experience Design, is built for today's UX/UI designers, with intuitive tools that eliminate speed bumps and make everyday tasks effortless. Get started with free UI kits, icon sets, and everything you need to create unique user experiences.</p>
-                        <hr>
-                        <p>Adobe XD, or Experience Design, is built for today's UX/UI designers, with intuitive tools that eliminate speed bumps and make everyday tasks effortless. Get started with free UI kits, icon sets, and everything you need to create unique user experiences.</p>
+                        <a href="">
+                            <p>Nasional Global Megapolitan Regional Pemilu Hype Konsultasi Hukum Cek Fakta Surat Pembaca Indeks
+                            Kilas Daerah Kilas Korporasi Kilas Kementerian Sorot Politik Kilas Badan Negara Kelana Indonesia Kalbe Health Corner Kilas Parlemen Kilas BUMN
+                            </p>
+                        </a>
                         <div class="text-right border-t pt-2">
                             <a href="#" class="inline-block bg-green-700 text-white px-5 py-2 rounded-md hover:bg-green-800 transition-all duration-300 transform hover:scale-105">Selengkapnya ></a>
                         </div>
