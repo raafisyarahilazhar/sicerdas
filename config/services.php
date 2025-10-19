@@ -35,9 +35,16 @@ return [
         ],
     ],
 
-    'whatsapp' => [
-        'url' => env('WHATSAPP_API_URL'),
-        'api_key' => env('WHATSAPP_API_KEY'),
+    'fonnte' => [
+        'token'   => env('FONNTE_TOKEN'),
+        'country_code' => env('FONNTE_COUNTRY_CODE', '62'),
+        'connect_only' => env('FONNTE_CONNECT_ONLY', true),
+        'send_mode' => env('FONNTE_SEND_MODE', 'auto'),
     ],
+    // 'whatsapp' => [
+    //     'token'    => env('WHATSAPP_TOKEN'),
+    //     'phone_id' => env('WHATSAPP_PHONE_ID'),
+    //     'send_mode' => env('WHATSAPP_SEND_MODE', 'attachment'),
+    // ]
 
 ];

@@ -7,18 +7,16 @@ use Illuminate\Http\Request;
 use App\Services\DocumentService;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;   // <--- tambahkan
 
 class ApplicationApprovalController extends Controller
 {
     protected $documentService;
     protected $notificationService;
 
-    /**
-     * Inject kedua service melalui constructor
-     */
     public function __construct(DocumentService $documentService, NotificationService $notificationService)
     {
-        $this->documentService = $documentService;
+        $this->documentService   = $documentService;
         $this->notificationService = $notificationService;
     }
 
@@ -30,7 +28,7 @@ class ApplicationApprovalController extends Controller
         $user = Auth::user();
         $nextStatus = null;
 
-        // Logika alur persetujuan berjenjang
+        // Alur persetujuan berjenjang
         switch ($application->status) {
             case 'pending_rt':
                 if ($user->role === 'rt' && $user->rt_id === $application->resident->rt_id) {
@@ -49,31 +47,53 @@ class ApplicationApprovalController extends Controller
                 break;
         }
 
-        // Admin/Operator bisa menyetujui langsung dari status apapun
-        if (in_array($user->role, ['admin'])) {
-             $nextStatus = 'approved';
+        // Admin/Operator dapat menyetujui langsung (opsional: tambahkan 'operator')
+        if (in_array($user->role, ['admin', 'operator'])) {
+            $nextStatus = 'approved';
         }
 
-        if ($nextStatus) {
-            $application->update(['status' => $nextStatus]);
+        if (!$nextStatus) {
+            return back()->with('error', 'Anda tidak memiliki izin untuk menyetujui permohonan pada tahap ini.');
+        }
 
-            // Jika statusnya sudah 'approved', panggil service untuk membuat surat & kirim notifikasi
-            if ($nextStatus === 'approved') {
-                $isGenerated = $this->documentService->generate($application);
+        // Update status & refresh model agar status terbaru terbaca service
+        $application->update(['status' => $nextStatus]);
+        $application->refresh();
 
-                if ($isGenerated) {
-                    // Panggil service notifikasi setelah surat berhasil dibuat
-                    $this->notificationService->sendSuratSelesaiNotification($application);
-                    return back()->with('success', 'Persetujuan berhasil, dokumen telah dibuat dan notifikasi WhatsApp sedang dikirim.');
-                } else {
-                    return back()->with('error', 'Persetujuan berhasil, namun pembuatan dokumen otomatis gagal. Cek template surat.');
-                }
+        // Jika sudah approved -> coba generate PDF, tapi apapun hasilnya, tetap kirim notifikasi
+        if ($nextStatus === 'approved') {
+            $isGenerated = false;
+
+            try {
+                $isGenerated = (bool) $this->documentService->generate($application);
+                // dokumen service bisa saja update pdf_path -> refresh supaya kebaca oleh Job
+                $application->refresh();
+            } catch (\Throwable $e) {
+                Log::error('Document generation failed for ref '.$application->ref_number.' : '.$e->getMessage(), [
+                    'app_id' => $application->id,
+                    'trace'  => $e->getTraceAsString(),
+                ]);
             }
 
-            return back()->with('success', 'Permohonan berhasil disetujui.');
+            // ⚠️ SELALU kirim notifikasi (job akan memutuskan kirim PDF / link / teks)
+            try {
+                $this->notificationService->sendSuratSelesaiNotification($application);
+            } catch (\Throwable $e) {
+                Log::error('WhatsApp notification dispatch failed for ref '.$application->ref_number.' : '.$e->getMessage(), [
+                    'app_id' => $application->id,
+                    'trace'  => $e->getTraceAsString(),
+                ]);
+            }
+
+            return back()->with(
+                $isGenerated ? 'success' : 'warning',
+                $isGenerated
+                    ? 'Persetujuan berhasil, dokumen dibuat, dan notifikasi WhatsApp dikirim.'
+                    : 'Persetujuan berhasil, namun pembuatan dokumen gagal. Notifikasi WhatsApp tetap dikirim tanpa lampiran.'
+            );
         }
 
-        return back()->with('error', 'Anda tidak memiliki izin untuk menyetujui permohonan pada tahap ini.');
+        return back()->with('success', 'Permohonan berhasil disetujui.');
     }
 
     /**
@@ -82,14 +102,13 @@ class ApplicationApprovalController extends Controller
     public function reject(Request $request, Application $application)
     {
         $user = Auth::user();
-        
-        // Otorisasi sederhana
+
         if (!in_array($user->role, ['rt', 'rw', 'kades', 'operator', 'admin'])) {
-             return back()->with('error', 'Anda tidak memiliki izin untuk menolak permohonan ini.');
+            return back()->with('error', 'Anda tidak memiliki izin untuk menolak permohonan ini.');
         }
 
         $application->update(['status' => 'rejected']);
-        
+
         return back()->with('success', 'Permohonan telah ditolak.');
     }
 }
