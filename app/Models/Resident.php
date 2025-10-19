@@ -10,16 +10,16 @@ class Resident extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'nik',
-        'name',
-        'birth_date',
-        'gender',
-        'phone',
-        'rw_id',
-        'rt_id',
-        'address',
-        'kk_number',
+        'user_id','nik','name','birth_date','gender','phone','rw_id','rt_id','address','kk_number',
+        'education_level','occupation','religion','marital_status','income_bracket',
+        'disability_status','blood_type','citizenship','lat','lng',
+    ];
+
+    protected $casts = [
+        'birth_date' => 'date',
+        'disability_status'=>'boolean',
+        'lat' => 'decimal:7',
+        'lng' => 'decimal:7',
     ];
 
     // Relasi ke RW
@@ -43,5 +43,10 @@ class Resident extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getAgeAttribute()
+    {
+        return $this->birth_date? $this->birth_date->age : null;
     }
 }

@@ -1,29 +1,53 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layout.main')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
+@section('content')
+<main class="container mx-auto p-6 lg:p-8">
+    {{-- Header --}}
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-green-700">Profil Akun</h2>
+        <p class="text-gray-600 max-w-3xl mt-1">
+            Kelola informasi pribadi, keamanan kata sandi, dan preferensi akun Anda.
+        </p>
     </div>
-</x-app-layout>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {{-- Informasi Profil (2 kolom) --}}
+        <section class="lg:col-span-2 p-6 rounded-lg shadow-sm border">
+            <h3 class="text-xl font-bold border-l-4 border-green-700 text-green-700 pl-4 mb-5">
+                INFORMASI PROFIL
+            </h3>
+            <div class="max-w-2xl text-justify">
+                @include('profile.partials.update-profile-information-form')
+            </div>
+        </section>
+
+        {{-- Ubah Kata Sandi (1 kolom) --}}
+        <section class="p-6 rounded-lg shadow-sm border">
+            <h3 class="text-xl font-bold border-l-4 border-green-700 text-green-700 pl-4 mb-5">
+                KEAMANAN (KATA SANDI)
+            </h3>
+            <div class="max-w-lg text-justify">
+                @include('profile.partials.update-password-form')
+            </div>
+        </section>
+
+        {{-- Demografi Warga (baru) --}}
+        <section class="lg:col-span-3 p-6 rounded-lg shadow-sm border">
+            @include('profile.partials.demography-form')
+        </section>
+
+
+        {{-- Hapus Akun (full width) --}}
+        <section class="lg:col-span-3 p-6 rounded-lg shadow-sm border">
+            <h3 class="text-xl font-bold border-l-4 border-green-700 text-green-700 pl-4 mb-5">
+                HAPUS AKUN
+            </h3>
+            <div class="max-w-xl text-justify">
+                @include('profile.partials.delete-user-form')
+            </div>
+        </section>
+
+    </div>
+</main>
+@endsection

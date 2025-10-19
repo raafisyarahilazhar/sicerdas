@@ -40,7 +40,26 @@
         .close-btn:hover {
             color: black;
         }
-    </style>
+        
+        .input-style{
+            display:block;width:100%;
+            border-radius:.5rem;border:1px solid #D1D5DB;padding:.625rem .875rem;
+            background:#fff;color:#111827;
+            box-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);
+            transition:box-shadow .15s,border-color .15s;
+        }
+        .input-style:focus{
+            outline:none; --tw-ring-color:#16a34a;
+            box-shadow:0 0 0 2px var(--tw-ring-color);
+            border-color:#16a34a;
+        }
+        .btn-primary{
+            background:#16a34a;color:#fff;font-weight:600;
+            padding:.5rem 1rem;border-radius:.375rem;
+            transition:background-color .2s;
+        }
+        .btn-primary:hover{ background:#15803d; }
+        </style>
    
 </head>
 
