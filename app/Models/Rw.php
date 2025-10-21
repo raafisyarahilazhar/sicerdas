@@ -10,7 +10,7 @@ class RW extends Model
     use HasFactory;
 
     protected $table = 'rws';
-    protected $fillable = ['nomor_rw', 'nama_ketua'];
+    protected $fillable = ['name', 'nomor_rw'];
 
     public function rts()
     {

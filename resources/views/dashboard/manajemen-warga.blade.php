@@ -16,6 +16,7 @@
                         <th scope="col" class="px-6 py-3">Nama</th>
                         <th scope="col" class="px-6 py-3">NIK</th>
                         <th scope="col" class="px-6 py-3">Alamat</th>
+                        <th scope="col" class="px-6 py-3">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -24,6 +25,10 @@
                             <td class="px-6 py-4 font-medium text-green-900">{{ $resident->name }}</td>
                             <td class="px-6 py-4">{{ $resident->nik }}</td>
                             <td class="px-6 py-4">{{ $resident->address }}</td>
+                            <td class="px-6 py-4">
+                                <a href="{{ route('dashboard-warga-detail', $resident->id) }}" 
+                                   class="text-green-600 hover:underline">Lihat Detail</a>  
+                            </td>
                         </tr>
                     @empty
                         <tr>

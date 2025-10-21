@@ -10,7 +10,7 @@ class RT extends Model
     use HasFactory;
 
     protected $table = 'rts';
-    protected $fillable = ['nomor_rt', 'nama_ketua', 'rw_id'];
+    protected $fillable = ['rw_id', 'name', 'nomor_rt'];
 
     public function rw()
     {

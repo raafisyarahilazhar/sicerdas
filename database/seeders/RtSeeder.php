@@ -13,8 +13,9 @@ class RtSeeder extends Seeder
         foreach (range(1, 3) as $rwId) {
             for ($i = 1; $i <= 2; $i++) {
                 Rt::create([
-                    'name' => "RT 0$rwId$i",
+                    'name' => "RT 0$i",
                     'rw_id' => $rwId,
+                    'nomor_rt' => "$i",
                 ]);
             }
         }

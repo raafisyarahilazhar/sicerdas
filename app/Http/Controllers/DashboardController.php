@@ -214,6 +214,28 @@ class DashboardController extends Controller
         }
     }
 
+    public function detailDataWarga(Resident $resident)
+    {
+        $user = Auth::user();
+
+        // Batasi akses sesuai peran
+        if ($user->role === 'rt') {
+            if ($resident->rw_id !== $user->rw_id || $resident->rt_id !== $user->rt_id) {
+                abort(403, 'Anda tidak diizinkan mengakses data warga di luar RT Anda.');
+            }
+        } elseif ($user->role === 'rw') {
+            if ($resident->rw_id !== $user->rw_id) {
+                abort(403, 'Anda tidak diizinkan mengakses data warga di luar RW Anda.');
+            }
+        }
+        // kades/operator/admin: full access
+
+        // Eager load relasi untuk tampilan
+        $resident->load(['rt', 'rw', 'applications.applicationType']);
+
+        return view('dashboard.manajemen-warga-detail', compact('resident'));
+    }
+
     public function dataPermohonan()
     {
         $user = Auth::user();

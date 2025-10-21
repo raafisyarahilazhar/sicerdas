@@ -12,6 +12,7 @@ class RwSeeder extends Seeder
         for ($i = 1; $i <= 3; $i++) {
             Rw::create([
                 'name' => "RW 0$i",
+                'nomor_rw' => $i,
             ]);
         }
     }

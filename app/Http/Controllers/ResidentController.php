@@ -26,4 +26,9 @@ class ResidentController extends Controller
 
         return view('residents.index', compact('residents'));
     }
+
+    public function edit(Resident $resident)
+    {
+        return view('residents.edit', compact('resident'));
+    }
 }

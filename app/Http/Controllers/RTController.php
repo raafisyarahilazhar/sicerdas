@@ -11,20 +11,21 @@ class RTController extends Controller
     public function index()
     {
         $rts = RT::with('rw')->get();
-        return view('rts.index', compact('rts'));
+        return view('dashboard.rt.index', compact('rts'));
     }
 
-    public function create()
+    public function create(rt $rt)
     {
         $rws = RW::all();
-        return view('rts.create', compact('rws'));
+        return view('dashboard.rt.create', compact('rt', 'rws'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nomor_rt' => 'required|string|max:10',
             'rw_id' => 'required|exists:rws,id',
+            'name' => 'required|string|max:10',
+            'nomor_rt' => 'required|integer|max:10',
         ]);
 
         RT::create($request->all());
@@ -34,14 +35,15 @@ class RTController extends Controller
     public function edit(RT $rt)
     {
         $rws = RW::all();
-        return view('rts.edit', compact('rt', 'rws'));
+        return view('dashboard.rt.edit', compact('rt', 'rws'));
     }
 
     public function update(Request $request, RT $rt)
     {
         $request->validate([
-            'nomor_rt' => 'required|string|max:10',
             'rw_id' => 'required|exists:rws,id',
+            'name' => 'required|string|max:10',
+            'nomor_rt' => 'required|integer|max:10',
         ]);
 
         $rt->update($request->all());

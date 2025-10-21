@@ -3,18 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RtController;
-use App\Http\Controllers\RwController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ApplicationTypeController;
 use App\Http\Controllers\ApplicationApprovalController;
 use App\Http\Controllers\AntreanController;
 use App\Http\Controllers\BeritaController;
-use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\ManajemenKontenController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RtController;
+use App\Http\Controllers\RwController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('dashboard')->group(function() {
             Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
             Route::get('/data-warga', [DashboardController::class, 'dataWarga'])->name('dashboard-warga');
+            Route::get('/data-warga-detail/{resident}', [DashboardController::class, 'detailDataWarga'])->name('dashboard-warga-detail');
             Route::get('/data-permohonan', [DashboardController::class, 'dataPermohonan'])->name('dashboard-permohonan');
             Route::get('/data-surat', [DashboardController::class, 'dataSurat'])->name('dashboard-surat');
         });
@@ -74,8 +75,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // --- Grup Rute Khusus untuk Manajemen (Hanya Admin & Operator) ---
     Route::middleware('role:admin,operator')->group(function() {
         Route::resource('users', UserController::class);
-        Route::resource('rts', RtController::class);
         Route::resource('rws', RwController::class);
+        Route::resource('rts', RtController::class);
         Route::resource('application-types', ApplicationTypeController::class);
 
         // --- Rute Manajemen Berita ---
