@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SICERDAS</title>
+    <link rel="shortcut icon" href="{{ asset('images/sicerdas_logo.png') }}" type="image/x-icon">
     <style>
         .alert {
             padding: 20px;
@@ -141,8 +142,10 @@
 
         <div class="bg-white border-b">
             <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-                <h1 id="title"class="text-4xl font-bold text-green-700 transform -translate-y-full opacity-0 transition-all duration-700 ease-out ">SICERDAS</h1>
-
+                <div class="flex items-center gap-x-3">
+                    <img src="{{ asset('images/sicerdas_logo.png') }}" alt="SICERDAS Logo" class="w-12 h-12"/>
+                    <h1 id="title" class="text-4xl font-bold text-green-700 transform -translate-y-full opacity-0 transition-all duration-700 ease-out">SICERDAS</h1>
+                </div>
                 <nav id="navMenu"
                     class="navMenu hidden md:flex items-center space-x-6 transform -translate-y-full opacity-0 transition-all duration-700 ease-out ">
                     <a href="/" class="text-green-800/90 font-medium hover:text-green-600 transition-colors">Beranda</a>

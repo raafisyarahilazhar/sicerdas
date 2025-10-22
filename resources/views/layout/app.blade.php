@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Sicerdas</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="shortcut icon" href="{{ asset('images/sicerdas_logo.png') }}" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,11 +36,16 @@
   <div class="flex h-screen bg-gray-100">
     {{-- SIDEBAR --}}
     <aside class="w-64 flex-shrink-0 bg-green-700 text-white flex flex-col">
-      <div class="h-20 flex items-center justify-center border-b border-green-800">
+      {{-- <div class="h-20 flex items-center justify-center border-b border-green-800">
         <h1 class="text-3xl font-bold tracking-wider">Sicerdas</h1>
+      </div> --}}
+
+      <div class="flex items-center gap-x-3 px-4 h-20 ">
+          <img src="{{ asset('images/sicerdas_logo.png') }}" alt="SICERDAS Logo" class="w-12 h-12"/>
+          <h1 id="title" class="text-3xl font-bold tracking-wider">SICERDAS</h1>
       </div>
 
-      <nav class="flex-grow px-4 py-6">
+      <nav class="flex-grow px-4 py-3">
         <ul class="space-y-2">
           {{-- Dashboard --}}
           <li>
@@ -238,9 +243,9 @@
     </div>
   </div>
 
+  <script src="https://cdn.tailwindcss.com"></script>
   {{-- Alpine (untuk dropdown) --}}
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
   {{-- Alert close --}}
   <script>
     document.addEventListener('DOMContentLoaded', function () {
