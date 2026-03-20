@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Berita;
+use App\Models\Announcement;
 
 class ManajemenKontenController extends Controller
 {
     public function index( )
     {
         $berita = Berita::latest()->paginate(10);
-        return view('dashboard.manajemen-konten', compact('berita'));
+        $pengumuman = Announcement::latest()->paginate(10);
+        return view('dashboard.manajemen-konten', compact('berita', 'pengumuman'));
     }
 
     // public function berita()

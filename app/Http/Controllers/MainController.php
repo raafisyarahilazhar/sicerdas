@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Berita;  
+use App\Models\Announcement;
 
 class MainController extends Controller
 {
@@ -12,7 +13,10 @@ class MainController extends Controller
     $berita = Berita::whereNotNull('published_at')
                         ->latest('published_at')
                         ->paginate(3);
-       return view('welcome', compact('berita'));
+    $pengumuman = Announcement::whereNotNull('created_at')
+                        ->latest('created_at')
+                        ->paginate(3);
+       return view('welcome', compact('berita', 'pengumuman'));
    }
 
    public function berita()
@@ -21,5 +25,13 @@ class MainController extends Controller
                         ->latest('published_at')
                         ->paginate(3);
        return view('berita.index', compact('berita'));
+   }
+
+   public function announcement()
+   {
+    $pengumuman = Announcement::whereNotNull('created_at')
+                        ->latest('created_at')
+                        ->paginate(3);
+       return view('pengumuman.index', compact('pengumuman'));
    }
 }

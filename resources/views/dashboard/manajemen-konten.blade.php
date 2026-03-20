@@ -83,6 +83,71 @@
             </table>
         </div>
     </div>
+    
+    {{-- Tabel Daftar Pengumuman --}}
+    <div class="bg-white p-6 rounded-2xl shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+             <h2 class="text-xl font-bold text-green-800">Semua Pengumuman Terpublikasi</h2>
+             <a href="{{ route('announcement.create') }}" class="btn-sm bg-green-600 hover:bg-green-700">+ Tulis Pengumuman Baru</a>
+        </div>
+       
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="text-xs text-gray-700 uppercase bg-green-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Judul</th>
+                        <th scope="col" class="px-6 py-3">Tanggal Publikasi</th>
+                        <th scope="col" class="px-6 py-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($pengumuman as $item)
+                        <tr class="bg-white border-b hover:bg-green-50">
+                            {{-- Menggunakan variabel $item yang benar dari loop --}}
+                            <td class="px-6 py-4 font-semibold text-gray-900">
+                                {{ Str::limit($item->title, 60) }}
+                            </td>
+                            {{-- <td class="px-6 py-4">
+                                {{-- Logika status untuk berita (Published/Draft) --}}
+                                {{-- @if($item->published_at)
+                                    <span class="px-2.5 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                                        Published
+                                    </span>
+                                @else
+                                     <span class="px-2.5 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
+                                        Draft
+                                    </span>
+                                @endif
+                            </td> --}}
+                            <td class="px-6 py-4">
+                                {{ $item->created_at ? $item->created_at->isoFormat('D MMM YYYY') : '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{-- Tombol untuk melihat detail berita --}}
+                                {{-- <a href="{{ route('announcement.show', $item) }}" 
+                                   target="_blank" 
+                                   class="btn-sm bg-blue-600 hover:bg-blue-700">
+                                   Lihat
+                                </a> --}}
+                                <form action="{{ route('announcement.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus pengumuman?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    {{-- Style diterapkan pada <button>, bukan <form> --}}
+                                    <button type="submit" class="btn-sm bg-red-600 hover:bg-red-700">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center px-6 py-4 text-gray-500">
+                                Belum ada pengumuman yang dipublikasikan.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </main>
 
 <style>

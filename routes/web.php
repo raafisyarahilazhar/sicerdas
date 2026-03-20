@@ -11,6 +11,7 @@ use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\ManajemenKontenController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\RtController;
 use App\Http\Controllers\RwController;
 use App\Http\Controllers\TrackingController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\UserController;
 
 Route::get('/', [MainController::class, 'index'])->name('welcome');
 Route::get('/news', [MainController::class, 'berita'])->name('news');
+Route::get('/pengumuman', [MainController::class, 'announcement'])->name('pengumuman');
 // Route::get('/', function () {
 //     return view('welcome');
 // })->name('welcome');
@@ -34,6 +36,7 @@ Route::post('/antrean/ambil', [AntreanController::class, 'ambil'])->name('antrea
 // --- Rute Berita Publik ---
 // Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
 Route::get('/berita/{berita}', [BeritaController::class, 'show'])->name('berita.show');
+Route::get('/announcement/{announcement}', [PengumumanController::class, 'show'])->name('announcement.show');
 /*
 |--------------------------------------------------------------------------
 | Rute Terotentikasi (Hanya untuk user yang sudah login)
@@ -79,11 +82,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('rts', RtController::class);
         Route::resource('application-types', ApplicationTypeController::class);
 
-        // --- Rute Manajemen Berita ---
         Route::get('konten', [ManajemenKontenController::class, 'index'])->name('dashboard.manajemen-konten');
+        // --- Rute Manajemen Berita ---
         Route::get('berita', [BeritaController::class, 'create'])->name('berita.create');
         Route::post('berita', [BeritaController::class, 'store'])->name('berita.store');
         Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
+        // Route manajemen pengumaman
+        Route::get('announcement', [PengumumanController::class, 'create'])->name('announcement.create');
+        Route::post('announcement', [PengumumanController::class, 'store'])->name('announcement.store');
+        Route::delete('announcement/{announcement}', [PengumumanController::class, 'destroy'])->name('announcement.destroy');
     });
 });
 
