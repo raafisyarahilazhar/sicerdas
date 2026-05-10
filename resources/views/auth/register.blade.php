@@ -69,43 +69,42 @@
                     </div>
 
                     {{-- RW --}}
-<div class="relative">
-  <span class="input-icon">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-    </svg>
-  </span>
-  <select id="rw_id" name="rw_id" class="input-field" required>
-    <option value="" disabled {{ old('rw_id') ? '' : 'selected' }}>-- Pilih RW --</option>
-    @foreach($rws as $rw)
-      <option value="{{ $rw->id }}" {{ old('rw_id') == $rw->id ? 'selected' : '' }}>
-        {{ $rw->name }}
-      </option>
-    @endforeach
-  </select>
-  @error('rw_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-</div>
+                    <div class="relative">
+                        <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                        <select id="rw_id" name="rw_id" class="input-field" required>
+                            <option value="" disabled {{ old('rw_id') ? '' : 'selected' }}>-- Pilih RW --</option>
+                            @foreach($rws as $rw)
+                            <option value="{{ $rw->id }}" {{ old('rw_id') == $rw->id ? 'selected' : '' }}>
+                                {{ $rw->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('rw_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
 
-{{-- RT (tergantung RW) --}}
-<div class="relative">
-  <span class="input-icon">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-    </svg>
-  </span>
-  <select id="rt_id" name="rt_id" class="input-field" required {{ old('rw_id') ? '' : 'disabled' }}>
-    <option value="" disabled {{ old('rt_id') ? '' : 'selected' }}>-- Pilih RT --</option>
-    @foreach($rts as $rt)
-      <option value="{{ $rt->id }}"
-              data-rw="{{ $rt->rw_id }}"
-              {{ old('rt_id') == $rt->id ? 'selected' : '' }}>
-        {{ $rt->name }}
-      </option>
-    @endforeach
-  </select>
-  @error('rt_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-</div>
-
+                    {{-- RT (tergantung RW) --}}
+                    <div class="relative">
+                        <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                        <select id="rt_id" name="rt_id" class="input-field" required {{ old('rw_id') ? '' : 'disabled' }}>
+                            <option value="" disabled {{ old('rt_id') ? '' : 'selected' }}>-- Pilih RT --</option>
+                            @foreach($rts as $rt)
+                            <option value="{{ $rt->id }}"
+                                    data-rw="{{ $rt->rw_id }}"
+                                    {{ old('rt_id') == $rt->id ? 'selected' : '' }}>
+                                {{ $rt->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('rt_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
 
                     <div class="relative">
                         <span class="input-icon">
