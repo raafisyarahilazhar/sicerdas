@@ -10,16 +10,16 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // Daftar semua user
+    /**
+     * Menampilkan daftar user dengan pagination.
+     */
     public function index()
     {
+        // Menggunakan paginate(10) untuk membatasi 10 data per halaman
         $users = User::with(['rt', 'rw'])->latest()->paginate(10);
-        $rts = Rt::all();
-        $rws = Rw::all();
-        return view('user.index', compact('users', 'rts', 'rws'));
+        return view('user.index', compact('users'));
     }
 
-    // Form tambah user
     public function create()
     {
         $rts = Rt::all();
@@ -27,22 +27,25 @@ class UserController extends Controller
         return view('user.create', compact('rts', 'rws'));
     }
 
-    // Simpan user baru
+    /**
+     * Simpan user baru dan otomatis buat data resident jika rolenya warga.
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'name'   => 'required|string|max:255',
-            'nik'    => 'required|string|max:16|unique:users,nik',
-            'email'  => 'nullable|email|unique:users,email',
-            'phone'  => 'nullable|string|max:15',
-            'alamat' => 'nullable|string',
-            'rt_id'  => 'nullable|exists:rts,id',
-            'rw_id'  => 'nullable|exists:rws,id',
-            'role'   => 'required|in:admin,kades,operator,rt,rw,warga',
+            'name'     => 'required|string|max:255',
+            'nik'      => 'required|string|max:16|unique:users,nik',
+            'email'    => 'nullable|email|unique:users,email',
+            'phone'    => 'nullable|string|max:15',
+            'alamat'   => 'nullable|string',
+            'rt_id'    => 'nullable|exists:rts,id',
+            'rw_id'    => 'nullable|exists:rws,id',
+            'role'     => 'required|in:admin,kades,operator,rt,rw,warga',
             'password' => 'required|min:6',
         ]);
 
-        User::create([
+        // Simpan user ke variabel agar bisa diakses rolenya
+        $user = User::create([
             'name'     => $request->name,
             'nik'      => $request->nik,
             'email'    => $request->email,
@@ -54,13 +57,14 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Logika otomatis pembuatan data resident (Warga)
         if ($user->role === 'warga') {
             $user->resident()->create([
-                'name' => $user->name,
-                'nik' => $user->nik,
-                'rw_id' => $user->rw_id,
-                'rt_id' => $user->rt_id,
-                'phone' => $user->phone,
+                'name'    => $user->name,
+                'nik'     => $user->nik,
+                'rw_id'   => $user->rw_id,
+                'rt_id'   => $user->rt_id,
+                'phone'   => $user->phone,
                 'address' => $user->alamat,
             ]);
         }
@@ -68,13 +72,11 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
-    // Detail user
     public function show(User $user)
     {
         return view('user.show', compact('user'));
     }
 
-    // Form edit user
     public function edit(User $user)
     {
         $rts = Rt::all();
@@ -82,7 +84,6 @@ class UserController extends Controller
         return view('user.edit', compact('user', 'rts', 'rws'));
     }
 
-    // Update user
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -96,11 +97,10 @@ class UserController extends Controller
             'role'   => 'required|in:admin,kades,operator,rt,rw,warga',
         ]);
 
-        $data = $request->all();
-        if ($request->password) {
+        $data = $request->only(['name', 'nik', 'email', 'phone', 'alamat', 'rt_id', 'rw_id', 'role']);
+        
+        if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
-        } else {
-            unset($data['password']);
         }
 
         $user->update($data);
@@ -108,7 +108,6 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }
 
-    // Hapus user
     public function destroy(User $user)
     {
         $user->delete();

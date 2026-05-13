@@ -149,62 +149,40 @@ class DashboardController extends Controller
 
             case 'rt':
                 $applications = Application::whereHas('resident', function($q) use ($user) {
-                        $q->where('rt_id', $user->rt_id)
-                        ->where('rw_id', $user->rw_id);
-                    })
-                    ->where('status', 'pending_rt')
-                    ->get();
+                        $q->where('rt_id', $user->rt_id)->where('rw_id', $user->rw_id);
+                    })->where('status', 'pending_rt')->get();
 
+                // Ganti get() menjadi paginate(10)
                 $residents = Resident::where('rt_id', $user->rt_id)
                     ->where('rw_id', $user->rw_id)
-                    ->get();
+                    ->paginate(10);
 
-                // 🔥 Ambil history 10 permohonan terakhir
                 $history = Application::whereHas('resident', function($q) use ($user) {
-                        $q->where('rt_id', $user->rt_id)
-                        ->where('rw_id', $user->rw_id);
-                    })
-                    ->latest()
-                    ->take(10)
-                    ->get();
+                        $q->where('rt_id', $user->rt_id)->where('rw_id', $user->rw_id);
+                    })->latest()->take(10)->get();
 
                 return view('dashboard.manajemen-warga', compact('applications', 'residents', 'history'));
 
             case 'rw':
                 $applications = Application::whereHas('resident', function($q) use ($user) {
                         $q->where('rw_id', $user->rw_id);
-                    })
-                    ->where('status', 'pending_rw')
-                    ->get();
+                    })->where('status', 'pending_rw')->get();
 
-                $residents = Resident::where('rw_id', $user->rw_id)->get();
+                // Ganti get() menjadi paginate(10)
+                $residents = Resident::where('rw_id', $user->rw_id)->paginate(10);
 
                 $history = Application::whereHas('resident', function($q) use ($user) {
                         $q->where('rw_id', $user->rw_id);
-                    })
-                    ->latest()
-                    ->take(10)
-                    ->get();
+                    })->latest()->take(10)->get();
 
                 return view('dashboard.manajemen-warga', compact('applications', 'residents', 'history'));
 
             case 'kades':
-                $applications = Application::where('status', 'pending_kades')->get();
-                $residents = Resident::all();
-                $history = Application::latest()->take(10)->get();
-
-                return view('dashboard.manajemen-warga', compact('applications', 'residents', 'history'));
-
             case 'operator':
-                $applications = Application::all();
-                $residents = Resident::all();
-                $history = Application::latest()->take(10)->get();
-
-                return view('dashboard.manajemen-warga', compact('applications', 'residents', 'history'));
-
             case 'admin':
+                // Untuk peran manajemen, tampilkan semua dengan pagination
                 $applications = Application::all();
-                $residents = Resident::all();
+                $residents = Resident::paginate(10);
                 $history = Application::latest()->take(10)->get();
 
                 return view('dashboard.manajemen-warga', compact('applications', 'residents', 'history'));
